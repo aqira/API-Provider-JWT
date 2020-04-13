@@ -1,7 +1,10 @@
 ﻿using API_Provider.Context;
+using API_Provider.Models;
+using API_Provider.ViewModel;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -15,24 +18,27 @@ namespace API_Provider.Controllers
     {
         MyContext db = new MyContext();
 
-        [Route("RouteGetToken")]
+        [Route("GetToken/{id}")]
         // GET: Token
-        public string GetToken()
+        public string GetTokenCustomer(string id)
         {
+            SqlParameter paramId = new SqlParameter("@Id", id);
+            UserRoleVM getById = db.Database.SqlQuery<UserRoleVM>("SP_AspNetUserRoles_TokenMapping @Id", paramId).Single(); ;
+
             string key = "my_secret_key_12345"; //Secret key which will be used later during validation    
             var issuer = "http://localhost:59950/";  //normally this will be your site URL    
             var audience = "http://localhost:59950/";
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
+            
             //Create a List of Claims, Keep claims name short    
             var permClaims = new List<Claim>();
             permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            permClaims.Add(new Claim("Valid", "1"));
-            permClaims.Add(new Claim("Id", "1"));
-            permClaims.Add(new Claim("Name", "Aqira"));
-            permClaims.Add(new Claim("Role", "Customer"));
+            permClaims.Add(new Claim("id", getById.Id));
+            permClaims.Add(new Claim("name", getById.Name));
+            permClaims.Add(new Claim("email", getById.Email));
+            permClaims.Add(new Claim("role", getById.Role));
 
             //Create Security Token object by giving required parameters    
             var token = new JwtSecurityToken(issuer, //Issuer    

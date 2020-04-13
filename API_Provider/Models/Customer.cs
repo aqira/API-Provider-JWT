@@ -18,9 +18,8 @@ namespace API_Provider.Models
         public string PostalCode { get; set; }
         public string Street { get; set; }
         public string PhoneNumber { get; set; }
-
+        
         //O (Customer): M (Orders)
         public ICollection<Order> Orders { get; set; }
-        
     }
 }

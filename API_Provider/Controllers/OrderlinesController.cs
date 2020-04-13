@@ -14,7 +14,7 @@ using API_Provider.Models;
 
 namespace API_Provider.Controllers
 {
-    [Authorize (Roles ="Administrator")]
+    [Authorize (Roles ="Admin")]
     public class OrderlinesController : ApiController
     {
         private MyContext db = new MyContext();
